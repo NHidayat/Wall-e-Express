@@ -2,6 +2,7 @@ const router = require("express").Router();
 
 const {
     getAllUser,
+    loginUser,
     registerUser,
     activationEmail,
     activationUser,
@@ -12,6 +13,7 @@ const {
 
 router.get("/user/", getAllUser);
 
+router.post("/login", loginUser);
 router.post("/register", registerUser);
 
 router.post('/email', activationEmail)

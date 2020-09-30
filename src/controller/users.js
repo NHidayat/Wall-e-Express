@@ -6,7 +6,6 @@ const {
     getAllUser,
     isUserExist,
     postUser,
-    postProfile,
     checkUser,
     checkKey,
     updating
@@ -91,23 +90,17 @@ module.exports = {
                     const encryptPassword = bcrypt.hashSync(user_password, salt);
                     const setData = {
                         user_email: user_email,
-                        user_password: encryptPassword,
                         user_first_name: user_first_name,
                         user_last_name: user_last_name,
+                        user_password: encryptPassword,
                         user_phone: user_phone,
+                        user_picture: 'blank.jpg',
+                        user_pin: '',
                         user_role: 2,
                         user_status: 0,
                         user_created_at: new Date()
                     }
                     const result = await postUser(setData);
-                    console.log(result)
-                    const setData2 = {
-                        user_id: result.id,
-                        profile_picture: '',
-                        profile_bio: '',
-                        profile_created_at: new Date()
-                    }
-                    const result2 = await postProfile(setData2)
                     return helper.response(
                         response,
                         200,

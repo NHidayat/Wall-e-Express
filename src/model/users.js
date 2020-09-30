@@ -36,25 +36,6 @@ module.exports = {
             });
         });
     },
-    postProfile: (setData) => {
-        return new Promise((resolve, reject) => {
-            connection.query(
-                "INSERT INTO profile SET ?",
-                setData,
-                (error, result) => {
-                    if (!error) {
-                        const newResult = {
-                            profile_id: result.insertId,
-                            ...setData,
-                        }
-                        resolve(newResult);
-                    } else {
-                        reject(new Error(error));
-                    }
-                }
-            )
-        })
-    },
     //============================================================================================================
     //===================================Activation User & Forgot Password========================================
     checkUser: (email) => {
