@@ -2,6 +2,7 @@ const router = require("express").Router();
 
 const {
     getAllUser,
+    getUserById,
     loginUser,
     registerUser,
     activationEmail,
@@ -10,8 +11,10 @@ const {
     changePassword
 
 } = require("../controller/users");
+const { authorization, authorization2 } = require("../middleware/auth");
 
-router.get("/user/", getAllUser);
+router.get("/user/", authorization2, getAllUser);
+router.get('/:id', authorization, getUserById)
 
 router.post("/login", loginUser);
 router.post("/register", registerUser);

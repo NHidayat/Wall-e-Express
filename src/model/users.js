@@ -8,6 +8,25 @@ module.exports = {
             });
         });
     },
+    getUserById: (id) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT * FROM user WHERE user_id = ? AND user_status = 1",
+                id,
+                (error, result) => {
+                    if (!error) {
+                        result.map(value => {
+                            delete value.user_password
+                            delete value.user_key
+                        })
+                        resolve(result)
+                    } else {
+                        reject(new Error(error))
+                    }
+                }
+            );
+        });
+    },
     //===================================Register========================================
     isUserExist: (email) => {
         return new Promise((resolve, reject) => {
