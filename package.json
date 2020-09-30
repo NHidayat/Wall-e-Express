@@ -1,0 +1,19 @@
+{
+  "name": "wall-e-express",
+  "version": "1.0.0",
+  "description": "\"# Wall-e-Express\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NHidayat/Wall-e-Express.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NHidayat/Wall-e-Express/issues"
+  },
+  "homepage": "https://github.com/NHidayat/Wall-e-Express#readme"
+}
