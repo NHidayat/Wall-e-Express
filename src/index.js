@@ -1,6 +1,9 @@
-const routes = require("express").Router()
+const routes = require("express").Router();
 
 const users = require("./routes/users");
-routes.use("/users", users);
+const payment = require("./routes/payment");
 
-module.exports = routes
+routes.use("/users", users);
+routes.use("/payment", payment);
+
+module.exports = routes;
