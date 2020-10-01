@@ -17,7 +17,39 @@ module.exports = {
                     if (!error) {
                         result.map(value => {
                             delete value.user_key
+                            delete value.user_password
+                            delete value.user_pin
                         })
+                        resolve(result)
+                    } else {
+                        reject(new Error(error))
+                    }
+                }
+            );
+        });
+    },
+    checkPin: (id) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT user_pin FROM user WHERE user_id = ?",
+                id,
+                (error, result) => {
+                    if (!error) {
+                        resolve(result)
+                    } else {
+                        reject(new Error(error))
+                    }
+                }
+            );
+        });
+    },
+    getPasswordById: (id) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT user_password FROM user WHERE user_id = ?",
+                id,
+                (error, result) => {
+                    if (!error) {
                         resolve(result)
                     } else {
                         reject(new Error(error))
@@ -49,6 +81,17 @@ module.exports = {
             connection.query(
                 "SELECT user_email FROM user WHERE (user_email=?)",
                 email,
+                (error, result) => {
+                    !error ? resolve(result) : reject(new Error(error));
+                }
+            );
+        });
+    },
+    isPhoneExist: (phone) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT user_phone FROM user WHERE (user_phone=?)",
+                phone,
                 (error, result) => {
                     !error ? resolve(result) : reject(new Error(error));
                 }
