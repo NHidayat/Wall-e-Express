@@ -2,9 +2,11 @@ const bcrypt = require("bcrypt");
 const helper = require("../helper/index");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer")
+const fs = require("fs");
 const {
     getAllUser,
     getUserById,
+    patchUser,
     isUserExist,
     postUser,
     checkUser,
@@ -34,6 +36,210 @@ module.exports = {
             return helper.response(response, 400, 'Bad Request', error)
         }
     },
+    //======================================Edit User============================================
+    patchPassword: async (request, response) => {
+        try {
+            const { user_id } = request.params;
+            const { old_password, user_password } = request.body
+            if (
+                request.body.old_password === undefined ||
+                request.body.old_password === null ||
+                request.body.old_password === ""
+            ) {
+                return helper.response(response, 404, "Old Password must be filled");
+            } else if (
+                request.body.user_password === undefined ||
+                request.body.user_password === null ||
+                request.body.user_password === ""
+            ) {
+                return helper.response(response, 404, "New Password must be filled");
+            } else if (
+                !user_password.match(/[A-Z]/g) ||
+                !user_password.match(/[0-9]/g) ||
+                user_password.length < 8 ||
+                user_password.length > 16
+            ) {
+                return helper.response(
+                    response,
+                    400,
+                    "Password Must include 8-16 characters, at least 1 digit number and 1 Uppercase"
+                );
+            } else if (request.body.confirm_password !== request.body.user_password) {
+                return helper.response(response, 400, "Password didn't match")
+            }
+            const checkUser = await getUserById(user_id)
+            if (checkUser.length > 0) {
+                const checkPassword = bcrypt.compareSync(
+                    old_password,
+                    checkUser[0].user_password
+                );
+                if (checkPassword) {
+                    const salt = bcrypt.genSaltSync(10);
+                    const encryptPassword = bcrypt.hashSync(user_password, salt);
+                    const setDataUser = {
+                        user_password: encryptPassword,
+                    }
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Success Password Updated",
+                        result
+                    );
+                } else {
+                    return helper.response(response, 400, "Wrong Password !");
+                }
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error)
+        }
+    },
+    patchPhone: async (request, response) => {
+        try {
+            const { user_id } = request.params;
+            const { user_phone } = request.body
+            if (
+                request.body.user_phone === undefined ||
+                request.body.user_phone === null ||
+                request.body.user_phone === ""
+            ) {
+                return helper.response(response, 404, "Phone Number must be filled");
+            } else if (
+                request.body.user_phone.length < 8 ||
+                request.body.user_phone.length > 16
+            ) {
+                return helper.response(response, 404, "Invalid Phone Number");
+            }
+            const checkUser = await getUserById(user_id)
+            if (checkUser.length > 0) {
+                const setDataUser = {
+                    user_phone: user_phone,
+                }
+                const result = await patchUser(setDataUser, user_id);
+                return helper.response(
+                    response,
+                    200,
+                    "Success Phone Updated",
+                    result
+                );
+
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error)
+        }
+    },
+    patchImage: async (request, response) => {
+        try {
+            const { user_id } = request.params;
+            const checkUser = await getUserById(user_id)
+            if (checkUser.length > 0) {
+                const setDataUser = {
+                    user_picture: request.file
+                }
+                if (
+                    checkUser[0].user_picture === "blank.jpg"
+                ) {
+                    if (request.file === undefined) {
+                        setDataUser.user_picture = 'blank.jpg'
+                    } else {
+                        setDataUser.user_picture = request.file.filename
+                    }
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Success Image Updated",
+                        result
+                    );
+                } else if (request.file === undefined) {
+                    setDataUser.user_picture = checkUser[0].user_picture
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Success Image Updated",
+                        result
+                    );
+                } else {
+                    setDataUser.user_picture = request.file.filename
+                    fs.unlink(`./uploads/${checkUser[0].user_picture}`, (error) => {
+                        if (error) {
+                            throw error
+                        }
+                    })
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Success Image Updated",
+                        result
+                    );
+                }
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error)
+        }
+    },
+    patchPin: async (request, response) => {
+        try {
+            const { user_id } = request.params;
+            const { user_pin } = request.body
+            if (
+                request.body.user_pin === undefined ||
+                request.body.user_pin === null ||
+                request.body.user_pin === ""
+            ) {
+                return helper.response(response, 404, "Pin must be filled");
+            }
+            const checkUser = await getUserById(user_id)
+            if (checkUser.length > 0) {
+                const setDataUser = {
+                    user_pin: user_pin,
+                }
+                const result = await patchUser(setDataUser, user_id);
+                return helper.response(
+                    response,
+                    200,
+                    "Success Pin Updated",
+                    result
+                );
+
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error)
+        }
+    },
+    deactivateUser: async (request, response) => {
+        try {
+            const { user_id } = request.params;
+            const checkUser = await getUserById(user_id)
+            if (checkUser.length > 0) {
+                const setDataUser = {
+                    user_status: '0',
+                }
+                const result = await patchUser(setDataUser, user_id);
+                return helper.response(
+                    response,
+                    200,
+                    "Success Deactivate User",
+                    result
+                );
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error)
+        }
+    },
+    //===============================================================================================
     //======================================Register================================================
     registerUser: async (request, response) => {
         try {

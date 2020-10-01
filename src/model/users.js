@@ -16,7 +16,6 @@ module.exports = {
                 (error, result) => {
                     if (!error) {
                         result.map(value => {
-                            delete value.user_password
                             delete value.user_key
                         })
                         resolve(result)
@@ -26,6 +25,23 @@ module.exports = {
                 }
             );
         });
+    },
+    patchUser: (setData, id) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "UPDATE user SET ? WHERE user_id = ?", [setData, id], (error, result) => {
+                    if (!error) {
+                        const newResult = {
+                            user_id: id,
+                            ...setData,
+                        }
+                        resolve(newResult);
+                    } else {
+                        reject(new Error(error));
+                    }
+                }
+            )
+        })
     },
     //===================================Register========================================
     isUserExist: (email) => {
