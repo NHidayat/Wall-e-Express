@@ -1,5 +1,11 @@
 const helper = require("../helper/index");
-const { createPayment, postHistory } = require("../model/payment");
+const {
+  createPayment,
+  postHistory,
+  postTopUp,
+  updateBalance,
+  checkUser,
+} = require("../model/payment");
 
 module.exports = {
   postPayment: async (request, response) => {
@@ -77,5 +83,34 @@ module.exports = {
         // TODO set transaction status on your databaase to 'pending' / waiting payment
       }
     });
+  },
+  postManualPayment: async (request, response) => {
+    try {
+      const { user_id, history_nominal } = request.body;
+      const setData = {
+        user_id,
+        history_nominal,
+        history_created_at: new Date(),
+      };
+      if (user_id === "" || user_id === null) {
+        return helper.response(response, 400, "User ID must be filled");
+      } else if ((history_nominal === "") | (history_nominal === null)) {
+        return helper.response(response, 400, "Nominal must be filled");
+      }
+      let manualTopUp = await postTopUp(setData);
+      // console.log(manualTopUp);
+      let checkId = await checkUser(user_id);
+      // console.log(checkId);
+      if (checkId.length > 0) {
+        let newBalance =
+          parseInt(manualTopUp.history_nominal) +
+          parseInt(checkId[0].user_balance);
+        // console.log(newBalance);
+        const balanceUpdated = await updateBalance(newBalance, user_id);
+        return helper.response(response, 200, "User Balance Updated");
+      }
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request");
+    }
   },
 };

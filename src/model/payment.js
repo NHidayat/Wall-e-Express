@@ -49,4 +49,37 @@ module.exports = {
       });
     });
   },
+  postTopUp: (setData) => {
+    return new Promise((resolve, reject) => {
+      db.query("INSERT INTO history SET ?", setData, (error, result) => {
+        if (!error) {
+          const newResult = {
+            id: result.insertId,
+            ...setData,
+          };
+          resolve(newResult);
+        } else {
+          console.log(error);
+        }
+      });
+    });
+  },
+  checkUser: (id) => {
+    return new Promise((resolve, reject) => {
+      db.query("SELECT * FROM user WHERE user_id = ?", id, (error, result) => {
+        !error ? resolve(result) : reject(new Error(error));
+      });
+    });
+  },
+  updateBalance: (balance, id) => {
+    return new Promise((resolve, reject) => {
+      db.query(
+        "UPDATE user SET user_balance = ? WHERE user_id = ?",
+        [balance, id],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error));
+        }
+      );
+    });
+  },
 };
