@@ -4,12 +4,12 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer")
 const {
     getAllUser,
+    getUserById,
     isUserExist,
     postUser,
     checkUser,
     checkKey,
     updating
-
 } = require("../model/users");
 
 module.exports = {
@@ -19,6 +19,19 @@ module.exports = {
             return helper.response(response, 200, "Success Get All User", result);
         } catch (error) {
             return helper.response(response, 400, "Bad Request", error);
+        }
+    },
+    getUserById: async (request, response) => {
+        try {
+            const { id } = request.params
+            const result = await getUserById(id)
+            if (result.length > 0) {
+                return helper.response(response, 200, "Success Get User By Id", result);
+            } else {
+                return helper.response(response, 404, `User By Id: ${id} Not Found`);
+            }
+        } catch (error) {
+            return helper.response(response, 400, 'Bad Request', error)
         }
     },
     //======================================Register================================================
@@ -225,6 +238,9 @@ module.exports = {
                         user_email,
                         user_first_name,
                         user_last_name,
+                        user_phone,
+                        user_picture,
+                        user_pin,
                         user_role,
                         user_status,
                     } = checkDataUser[0];
@@ -233,6 +249,9 @@ module.exports = {
                         user_email,
                         user_first_name,
                         user_last_name,
+                        user_phone,
+                        user_picture,
+                        user_pin,
                         user_role,
                         user_status,
                     };
@@ -244,12 +263,6 @@ module.exports = {
                         );
                     } else {
                         const token = jwt.sign(payload, "RAHASIA", { expiresIn: "2h" });
-                        // const refreshToken = jwt.sign(payload, "RAHASIA", {
-                        //     expiresIn: "48h",
-                        // })
-                        // refreshTokens[refreshToken] = user_id
-                        // console.log(refreshTokens)
-                        // payload = { ...payload, token, refreshToken }
                         payload = { ...payload, token };
                         return helper.response(response, 200, "Success Login", payload);
                     }
@@ -286,9 +299,9 @@ module.exports = {
                     },
                 })
                 await transporter.sendMail({
-                    from: '"EchteTalk"',
+                    from: '"Wall-E"',
                     to: user_email,
-                    subject: "EchteTalk - Forgot Password",
+                    subject: "Wall-E - Forgot Password",
                     html: `<a href="http://localhost:8080/setpassword?keys=${keys}">Click Here To Change Password</a>`,
                 }),
                     function (error) {
