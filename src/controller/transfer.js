@@ -27,7 +27,8 @@ module.exports = {
                     return helper.response(response, 403, 'Your PIN is Wrong')
 
                 } else if (transfer_amount > checkUser[0].user_balance) {
-                    return helper.response(response, 403, `Sorry, your account balance is not sufficient for this transaction. Your account balance is Rp ${checkUser[0].user_balance}`)
+                    const formatBalance = helper.formatN(checkUser[0].user_balance)
+                    return helper.response(response, 403, `Sorry, your account balance is not sufficient for this transaction. Your account balance is Rp ${formatBalance}`)
 
                 } else {
                     const newTransId = new Date().getTime()
@@ -62,7 +63,8 @@ module.exports = {
                     const postNotif = postNotification(setNotifData)
 
                     const newResult = { post1, post2 }
-                    return helper.response(response, 200, `Your transfer was successful. Now, Your account balance is Rp ${calBalance}`, newResult)
+                     const formatBalance = helper.formatN(calBalance)
+                    return helper.response(response, 200, `Your transfer was successful. Now, Your account balance is Rp ${formatBalance}`, newResult)
                 }
             }
         } catch (e) {

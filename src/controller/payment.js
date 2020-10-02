@@ -107,7 +107,9 @@ module.exports = {
           parseInt(checkId[0].user_balance);
         // console.log(newBalance);
         const balanceUpdated = await updateBalance(newBalance, user_id);
-        return helper.response(response, 200, "User Balance Updated");
+        
+        const formatBalance = helper.formatN(newBalance)
+        return helper.response(response, 200, `User Balance Updated. Now your account balance is Rp ${formatBalance}`);
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request");

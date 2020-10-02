@@ -8,4 +8,7 @@ module.exports = {
 
         return response.status(result.status).json(result);
     },
+    formatN: (x) => {
+    	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    }
 };
