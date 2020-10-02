@@ -10,7 +10,7 @@ module.exports = {
         if (
             user_id_a == '' || user_id_a == undefined ||
             user_id_b == '' || user_id_b == undefined ||
-            transfer_amount == '' || transfer_amount == undefined ||
+            transfer_amount == '' || transfer_amount == undefined || transfer_amount < 1 ||
             user_pin == '' || user_pin == undefined
         ) {
             return helper.response(response, 403, 'Data is not complete')
