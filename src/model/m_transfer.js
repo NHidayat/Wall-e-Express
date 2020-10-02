@@ -14,14 +14,14 @@ module.exports = {
                 } else {
                     reject(new Error(error));
                 }
-            });
-        });
+            })
+        })
 	},
-	postNotification: (data) => {
+	getTransferByUser: (id) => {
 		return new Promise((resolve, reject) => {
-            connection.query("INSERT INTO notification SET ?", data, (error, result) => {
+            connection.query("SELECT * FROM transfer WHERE user_id_a = ?", id, (error, result) => {
                 !error ? resolve(result) : reject(new Error(error))
-            });
-        });
+            })
+        })
 	}
 }

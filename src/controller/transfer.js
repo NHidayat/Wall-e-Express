@@ -1,6 +1,7 @@
 const helper = require('../helper/index');
 const { getUserByIdV2, patchUser } = require('../model/users')
-const { postTransfer, postNotification } = require('../model/m_transfer')
+const { postTransfer, getTransferByUser } = require('../model/m_transfer')
+const { postNotification } = require('../model/m_notification')
 
 module.exports = {
     postTransfer: async (request, response) => {
@@ -61,16 +62,35 @@ module.exports = {
                     const postNotif = postNotification(setNotifData)
 
                     const newResult = { post1, post2 }
-                    return helper.response(response, 200, 'Your transfer was successful', newResult)
+                    return helper.response(response, 200, `Your transfer was successful. Now, Your account balance is Rp ${calBalance}`, newResult)
                 }
             }
         } catch (e) {
             console.log(e)
-            return helper.response(response, 400, 'Bad Request', newResult)
+            return helper.response(response, 400, 'Bad Request')
         }
     },
-    getTransferByUser:async (request, response) => {
+    getUserTransfer:async (request, response) => {
     	const { id } = request.params
-    	console.log(id)
+    	try {
+    		 const checkUser = await getUserByIdV2(id)
+
+            if (checkUser.length < 1) {
+                return helper.response(response, 404, 'User is not found!')
+
+            } else {
+            	const result = await getTransferByUser(id)
+
+            	for(i = 0; i < result.length; i++) {
+            		const getName = await getUserByIdV2(result[i].user_id_b)
+            		result[i].user_name_b = getName[0].user_first_name + ' ' + getName[0].user_last_name 
+            	}
+
+            	helper.response(response, 200, `Success get transaction by user ID ${id}`, result)
+            }
+    	} catch(e) {
+    		console.log(e)
+    		return helper.response(response, 400, 'Bad Request')
+    	}
     }
 }
