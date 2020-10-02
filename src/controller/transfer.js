@@ -17,17 +17,21 @@ module.exports = {
         }
 
         try {
-            const checkUser = await getUserByIdV2(user_id_a)
+            const checkUserA = await getUserByIdV2(user_id_a)
+            const checkUserB = await getUserByIdV2(user_id_b)
 
-            if (checkUser.length < 1) {
-                return helper.response(response, 404, 'User is not found!')
+            if (checkUserA.length < 1) {
+                return helper.response(response, 404, `User with ID ${user_id_a} is not found!`)
+
+            } else if (checkUserB.length < 1) {
+                return helper.response(response, 404, `User target with ID ${user_id_b} is not found!`)
 
             } else {
-                if (user_pin !== checkUser[0].user_pin) {
+                if (user_pin !== checkUserA[0].user_pin) {
                     return helper.response(response, 403, 'Your PIN is Wrong')
 
-                } else if (transfer_amount > checkUser[0].user_balance) {
-                    const formatBalance = helper.formatN(checkUser[0].user_balance)
+                } else if (transfer_amount > checkUserA[0].user_balance) {
+                    const formatBalance = helper.formatN(checkUserA[0].user_balance)
                     return helper.response(response, 403, `Sorry, your account balance is not sufficient for this transaction. Your account balance is Rp ${formatBalance}`)
 
                 } else {
@@ -40,21 +44,25 @@ module.exports = {
                         transfer_amount,
                     }
                     const post1 = await postTransfer(setData)
-                    const calBalance = new Number(checkUser[0].user_balance) - new Number(transfer_amount)
-                    const setSaldo = {
-                        user_balance: calBalance
-                    }
-                    const UpdateUserBalance = await patchUser(setSaldo, user_id_a)
+                    const calBalanceA = parseInt(checkUserA[0].user_balance) - parseInt(transfer_amount)
 
-                    const setNewData = {
+                    let setSaldo = {
+                        user_balance: calBalanceA
+                    }
+                    const UpdateUserA_Balance = await patchUser(setSaldo, user_id_a)
+
+                    let setNewData = {
                         ...setData,
                         user_id_a: user_id_b,
                         user_id_b: user_id_a,
                         user_role: 2
                     }
                     const post2 = await postTransfer(setNewData)
+                    const calBalanceB = parseInt(checkUserB[0].user_balance) + parseInt(transfer_amount)
+                    setSaldo.user_balance = calBalanceB
+                    const UpdateUserB_Balance = await patchUser(setSaldo, user_id_b)
 
-                    const fullName = checkUser[0].user_first_name + ' ' + checkUser[0].user_last_name
+                    const fullName = checkUserA[0].user_first_name + ' ' + checkUserA[0].user_last_name
                     const setNotifData = {
                         user_id: user_id_b,
                         notif_subject: 'Transfered from ' + fullName,
@@ -63,8 +71,8 @@ module.exports = {
                     const postNotif = postNotification(setNotifData)
 
                     const newResult = { post1, post2 }
-                     const formatBalance = helper.formatN(calBalance)
-                    return helper.response(response, 200, `Your transfer was successful. Now, Your account balance is Rp ${formatBalance}`, newResult)
+                    const formatBalanceA = helper.formatN(calBalanceA)
+                    return helper.response(response, 200, `Your transfer was successful. Now, Your account balance is Rp ${formatBalanceA}`, newResult)
                 }
             }
         } catch (e) {
@@ -72,27 +80,27 @@ module.exports = {
             return helper.response(response, 400, 'Bad Request')
         }
     },
-    getUserTransfer:async (request, response) => {
-    	const { id } = request.params
-    	try {
-    		 const checkUser = await getUserByIdV2(id)
+    getUserTransfer: async (request, response) => {
+        const { id } = request.params
+        try {
+            const checkUser = await getUserByIdV2(id)
 
             if (checkUser.length < 1) {
                 return helper.response(response, 404, 'User is not found!')
 
             } else {
-            	const result = await getTransferByUser(id)
+                const result = await getTransferByUser(id)
 
-            	for(i = 0; i < result.length; i++) {
-            		const getName = await getUserByIdV2(result[i].user_id_b)
-            		result[i].user_name_b = getName[0].user_first_name + ' ' + getName[0].user_last_name 
-            	}
+                for (i = 0; i < result.length; i++) {
+                    const getName = await getUserByIdV2(result[i].user_id_b)
+                    result[i].user_name_b = getName[0].user_first_name + ' ' + getName[0].user_last_name
+                }
 
-            	helper.response(response, 200, `Success get transaction by user ID ${id}`, result)
+                helper.response(response, 200, `Success get transaction by user ID ${id}`, result)
             }
-    	} catch(e) {
-    		console.log(e)
-    		return helper.response(response, 400, 'Bad Request')
-    	}
+        } catch (e) {
+            console.log(e)
+            return helper.response(response, 400, 'Bad Request')
+        }
     }
 }
