@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer")
 const fs = require("fs");
 const {
-    getAllUser,
     getUserById,
     getPasswordById,
     checkPin,
@@ -18,14 +17,6 @@ const {
 } = require("../model/users");
 
 module.exports = {
-    getAllUser: async (request, response) => {
-        try {
-            const result = await getAllUser();
-            return helper.response(response, 200, "Success Get All User", result);
-        } catch (error) {
-            return helper.response(response, 400, "Bad Request", error);
-        }
-    },
     getUserById: async (request, response) => {
         try {
             const { id } = request.params
@@ -104,12 +95,24 @@ module.exports = {
             return helper.response(response, 400, "Bad Request", error)
         }
     },
-    patchPhone: async (request, response) => {
+    patchProfile: async (request, response) => {
         try {
             const { user_id } = request.params;
-            const { user_phone } = request.body
+            const { user_first_name, user_last_name, user_phone } = request.body
             const phoneInDatabase = await isPhoneExist(user_phone)
             if (
+                request.body.user_first_name === undefined ||
+                request.body.user_first_name === null ||
+                request.body.user_first_name === ""
+            ) {
+                return helper.response(response, 404, "First name must be filled");
+            } else if (
+                request.body.user_last_name === undefined ||
+                request.body.user_last_name === null ||
+                request.body.user_last_name === ""
+            ) {
+                return helper.response(response, 404, "Last name must be filled");
+            } else if (
                 request.body.user_phone === undefined ||
                 request.body.user_phone === null ||
                 request.body.user_phone === ""
@@ -128,13 +131,15 @@ module.exports = {
                 const checkUser = await getUserById(user_id)
                 if (checkUser.length > 0) {
                     const setDataUser = {
+                        user_first_name: user_first_name,
+                        user_last_name: user_last_name,
                         user_phone: user_phone,
                     }
                     const result = await patchUser(setDataUser, user_id);
                     return helper.response(
                         response,
                         200,
-                        "Success Phone Updated",
+                        "Success Profile Updated",
                         result
                     );
 
