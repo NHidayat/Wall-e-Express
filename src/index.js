@@ -1,4 +1,4 @@
-const routes = require("express").Router()
+const routes = require("express").Router();
 
 const users = require("./routes/users");
 const payment = require("./routes/payment")
@@ -9,4 +9,4 @@ routes.use("/payment", payment);
 routes.use("/transfer", transfer);
 routes.use("/notification", notification);
 
-module.exports = routes
+module.exports = routes;
