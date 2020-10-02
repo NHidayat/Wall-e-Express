@@ -70,27 +70,32 @@ module.exports = {
             } else if (request.body.confirm_password !== request.body.user_password) {
                 return helper.response(response, 400, "Password didn't match")
             }
-            const checkUser = await getPasswordById(user_id)
+            const checkUser = await getUserById(user_id)
             if (checkUser.length > 0) {
-                const checkPassword = bcrypt.compareSync(
-                    old_password,
-                    checkUser[0].user_password
-                );
-                if (checkPassword) {
-                    const salt = bcrypt.genSaltSync(10);
-                    const encryptPassword = bcrypt.hashSync(user_password, salt);
-                    const setDataUser = {
-                        user_password: encryptPassword,
-                    }
-                    const result = await patchUser(setDataUser, user_id);
-                    return helper.response(
-                        response,
-                        200,
-                        "Success Password Updated",
-                        result
+                const getPassword = await getPasswordById(user_id)
+                if (getPassword[0].user_password.length > 0) {
+                    const checkPassword = bcrypt.compareSync(
+                        old_password,
+                        getPassword[0].user_password
                     );
+                    if (checkPassword) {
+                        const salt = bcrypt.genSaltSync(10);
+                        const encryptPassword = bcrypt.hashSync(user_password, salt);
+                        const setDataUser = {
+                            user_password: encryptPassword,
+                        }
+                        const result = await patchUser(setDataUser, user_id);
+                        return helper.response(
+                            response,
+                            200,
+                            "Success Password Updated",
+                            result
+                        );
+                    } else {
+                        return helper.response(response, 400, "Wrong Password !");
+                    }
                 } else {
-                    return helper.response(response, 400, "Wrong Password !");
+                    return helper.response(response, 404, "Password is empty");
                 }
             } else {
                 return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
@@ -196,19 +201,49 @@ module.exports = {
             return helper.response(response, 400, "Bad Request", error)
         }
     },
+    isPinExist: async (request, response) => {
+        try {
+            const { user_id } = request.params
+            const checkUser = await getUserById(user_id)
+            const result = await checkPin(user_id)
+            if (checkUser.length > 0) {
+                if (result[0].user_pin.length > 0) {
+                    return helper.response(response, 200, "Success get pin", result);
+                } else {
+                    return helper.response(response, 404, "Pin is empty");
+                }
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, 'Bad Request', error)
+        }
+    },
     checkPin: async (request, response) => {
         try {
             const { user_id } = request.params
             const { user_pin } = request.body
+            if (
+                request.body.user_pin === undefined ||
+                request.body.user_pin === null ||
+                request.body.user_pin === ""
+            ) {
+                return helper.response(response, 404, "Pin must be filled");
+            }
+            const checkUser = await getUserById(user_id)
             const result = await checkPin(user_id)
-            if (result.length > 0) {
-                if (user_pin == result[0].user_pin) {
-                    return helper.response(response, 200, "Pin Match !", result);
+            if (checkUser.length > 0) {
+                if (result[0].user_pin.length > 0) {
+                    if (user_pin == result[0].user_pin) {
+                        return helper.response(response, 200, "Pin Match", result);
+                    } else {
+                        return helper.response(response, 404, "Wrong Pin");
+                    }
                 } else {
-                    return helper.response(response, 404, "Wrong Pin");
+                    return helper.response(response, 404, "Pin is empty");
                 }
             } else {
-                return helper.response(response, 404, `User By Id: ${id} Not Found`);
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
             }
         } catch (error) {
             return helper.response(response, 400, 'Bad Request', error)
@@ -225,7 +260,7 @@ module.exports = {
             ) {
                 return helper.response(response, 404, "Pin must be filled");
             }
-            const checkUser = await checkPin(user_id)
+            const checkUser = await getUserById(user_id)
             if (checkUser.length > 0) {
                 const setDataUser = {
                     user_pin: user_pin,

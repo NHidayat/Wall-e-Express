@@ -6,6 +6,7 @@ const {
     patchPassword,
     patchPhone,
     patchImage,
+    isPinExist,
     checkPin,
     patchPin,
     deactivateUser,
@@ -25,6 +26,7 @@ router.get('/:id', authorization, getUserById)
 router.patch("/patch/password/:user_id", authorization, patchPassword);
 router.patch("/patch/phone/:user_id", authorization, patchPhone);
 router.patch("/patch/image/:user_id", authorization, uploadImage, patchImage);
+router.get('/pin/exist/:user_id', authorization, isPinExist)
 router.get('/pin/:user_id', authorization, checkPin)
 router.patch("/patch/pin/:user_id", authorization, patchPin);
 router.patch("/deactivate/:user_id", authorization, deactivateUser);

@@ -11,7 +11,7 @@ module.exports = {
     getUserById: (id) => {
         return new Promise((resolve, reject) => {
             connection.query(
-                "SELECT * FROM user WHERE user_id = ? AND user_status = 1",
+                "SELECT * FROM user WHERE user_id = ?",
                 id,
                 (error, result) => {
                     if (!error) {
