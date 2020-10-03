@@ -2,7 +2,6 @@ const router = require("express").Router();
 
 const {
     getUserById,
-    // patchName,
     patchPassword,
     patchProfile,
     patchImage,
