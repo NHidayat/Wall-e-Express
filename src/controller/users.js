@@ -13,7 +13,8 @@ const {
     postUser,
     checkUser,
     checkKey,
-    updating
+    updating,
+    isPhone_OtherUserExist
 } = require("../model/users");
 
 module.exports = {
@@ -99,7 +100,7 @@ module.exports = {
         try {
             const { user_id } = request.params;
             const { user_first_name, user_last_name, user_phone } = request.body
-            const phoneInDatabase = await isPhoneExist(user_phone)
+            const phoneInDatabase = await isPhone_OtherUserExist(user_id, user_phone)
             if (
                 request.body.user_first_name === undefined ||
                 request.body.user_first_name === null ||

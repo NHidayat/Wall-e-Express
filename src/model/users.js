@@ -101,6 +101,17 @@ module.exports = {
             );
         });
     },
+    isPhone_OtherUserExist: (phone, user_id) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT user_phone FROM user WHERE user_phone = ? AND user_id != ?",
+                [phone, user_id],
+                (error, result) => {
+                    !error ? resolve(result) : reject(new Error(error));
+                }
+            );
+        });
+    },
     postUser: (setData) => {
         return new Promise((resolve, reject) => {
             connection.query("INSERT INTO user SET ?", setData, (error, result) => {
