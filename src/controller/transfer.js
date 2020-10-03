@@ -107,10 +107,19 @@ module.exports = {
         const { id } = request.params
         try {
             const weekExpense =  await getWeekBalance(id, 1)
+            console.log(weekExpense)
             const weekIncome =  await getWeekBalance(id, 2)
             const dailyExpense = await getDailyBalance(id, 1)
             const dailyIncome = await getDailyBalance(id, 2)
-            // for()
+
+            const options = { weekday: 'long'}
+            for(let i = 0; i < dailyExpense.length; i++) {
+                dailyExpense[i].day = new Intl.DateTimeFormat('en-US', options).format(dailyExpense[i].date)
+            }
+
+            for(let i = 0; i < dailyIncome.length; i++) {
+                dailyIncome[i].day = new Intl.DateTimeFormat('en-US', options).format(dailyIncome[i].date)
+            }
             const result = { weekExpense, weekIncome, dailyExpense, dailyIncome }
              helper.response(response, 200, `Success get balance statistic by user ID ${id}`, result)
         } catch(e) {
