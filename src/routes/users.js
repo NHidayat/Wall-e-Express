@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const {
+    getAllUser,
     getUserById,
     patchPassword,
     patchProfile,
@@ -20,6 +21,7 @@ const {
 const { authorization } = require("../middleware/auth");
 const uploadImage = require("../middleware/multer");
 
+router.get("/user/", authorization, getAllUser);
 router.get('/:id', authorization, getUserById)
 router.patch("/patch/password/:user_id", authorization, patchPassword);
 router.patch("/patch/profile/:user_id", authorization, patchProfile);
