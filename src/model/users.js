@@ -11,7 +11,6 @@ module.exports = {
                         result.map(value => {
                             delete value.user_key
                             delete value.user_password
-                            delete value.user_pin
                         })
                         resolve(result)
                     } else {

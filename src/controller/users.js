@@ -525,14 +525,7 @@ module.exports = {
                     } = checkDataUser[0];
                     let payload = {
                         user_id,
-                        user_email,
-                        user_first_name,
-                        user_last_name,
-                        user_phone,
-                        user_picture,
-                        user_pin,
-                        user_role,
-                        user_status,
+                        user_pin
                     };
                     if (user_status == 0) {
                         return helper.response(
