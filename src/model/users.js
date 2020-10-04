@@ -1,6 +1,30 @@
 const connection = require("../config/mysql");
 
 module.exports = {
+    getAllUser: (sort, limit, offset) => {
+        return new Promise((resolve, reject) => {
+            connection.query(`SELECT * FROM user WHERE user_status = 1 ORDER BY ${sort} LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
+                !error ? resolve(result) : reject(new Error(error));
+            });
+        });
+    },
+    getUserByName: (search) => {
+        return new Promise((resolve, reject) => {
+            connection.query(`SELECT * FROM user WHERE user_first_name LIKE '%${search}%' OR user_last_name LIKE '%${search}%'`, (error, result) => {
+                !error ? resolve(result) : reject(new Error(error));
+            });
+        });
+    },
+    getUserCount: () => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT COUNT(*) as total FROM user ",
+                (error, result) => {
+                    !error ? resolve(result[0].total) : reject(new Error(error));
+                }
+            );
+        });
+    },
     getUserById: (id) => {
         return new Promise((resolve, reject) => {
             connection.query(
@@ -26,7 +50,7 @@ module.exports = {
                 "SELECT * FROM user WHERE user_id = ?",
                 id,
                 (error, result) => {
-                   !error ? resolve(result) : reject(new Error(error))
+                    !error ? resolve(result) : reject(new Error(error))
                 }
             );
         });

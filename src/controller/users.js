@@ -3,7 +3,11 @@ const helper = require("../helper/index");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer")
 const fs = require("fs");
+const qs = require("querystring");
 const {
+    getAllUser,
+    getUserByName,
+    getUserCount,
     getUserById,
     getPasswordById,
     checkPin,
@@ -17,7 +21,81 @@ const {
     isPhone_OtherUserExist
 } = require("../model/users");
 
+const getPrevLink = (page, currentQuery) => {
+    if (page > 1) {
+        const generatedPage = {
+            page: page - 1,
+        };
+        const resultPrevLink = { ...currentQuery, ...generatedPage };
+        return qs.stringify(resultPrevLink);
+    } else {
+        return null;
+    }
+};
+
+const getNextLink = (page, totalPage, currentQuery) => {
+    if (page < totalPage) {
+        const generatedPage = {
+            page: page + 1,
+        };
+        const resultNextLink = { ...currentQuery, ...generatedPage };
+        return qs.stringify(resultNextLink);
+    } else {
+        return null;
+    }
+};
 module.exports = {
+    getAllUser: async (request, response) => {
+        try {
+            let { sort, page, limit } = request.query;
+
+            if (sort === undefined || sort === null || sort === "") {
+                sort = `user_id`;
+            }
+            if (page === undefined || page === null || page === "") {
+                page = parseInt(1);
+            } else {
+                page = parseInt(page);
+            }
+            if (limit === undefined || limit === null || limit === "") {
+                limit = parseInt(9);
+            } else {
+                limit = parseInt(limit);
+            }
+            let totalData = await getUserCount();
+            let totalPage = Math.ceil(totalData / limit);
+            let limits = page * limit;
+            let offset = page * limit - limit;
+            let prevLink = getPrevLink(page, request.query);
+            let nextLink = getNextLink(page, totalPage, request.query);
+
+            const pageInfo = {
+                page,
+                totalPage,
+                limit,
+                totalData,
+                prevLink: prevLink && `http://127.0.0.1:3001/users/user?${prevLink}`,
+                nextLink: nextLink && `http://127.0.0.1:3001/users/user?${nextLink}`,
+            };
+            const result = await getAllUser(sort, limit, offset);
+            return helper.response(response, 200, "Success Get All User", result, pageInfo);
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error);
+        }
+    },
+    getUserByName: async (request, response) => {
+        try {
+            let { search } = request.query;
+
+            if (search === undefined || search === null || search === "") {
+                search = "%";
+            }
+            const result = await getUserByName(search);
+            return helper.response(response, 200, "Success Get All User", result);
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error);
+        }
+    },
     getUserById: async (request, response) => {
         try {
             const { id } = request.params
@@ -148,7 +226,6 @@ module.exports = {
                     return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
                 }
             }
-
         } catch (error) {
             return helper.response(response, 400, "Bad Request", error)
         }
