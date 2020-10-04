@@ -17,9 +17,9 @@ module.exports = {
             })
         })
 	},
-	getTransferByUser: (id) => {
+	getTransferByUser: (id, limit, offset) => {
 		return new Promise((resolve, reject) => {
-            connection.query("SELECT * FROM transfer WHERE user_id_a = ?", id, (error, result) => {
+            connection.query(`SELECT * FROM transfer WHERE user_id_a = ${id} ORDER BY transfer_created_at DESC LIMIT ${limit} OFFSET ${offset}`, (error, result) => {
                 !error ? resolve(result) : reject(new Error(error))
             })
         })
@@ -37,5 +37,12 @@ module.exports = {
                 !error ? resolve(result) : reject(new Error(error))
             })
         })
-    }
+    },
+    getTransferCount: (id) => {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT COUNT(*) AS total FROM transfer WHERE user_id_a = ?', id, (error, result) => {
+                !error ? resolve(result[0].total) : reject(new Error(error))
+            })
+        })
+    },
 }

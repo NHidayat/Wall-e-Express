@@ -1,6 +1,6 @@
 const helper = require('../helper/index');
 const { getUserByIdV2, patchUser } = require('../model/users')
-const { postTransfer, getTransferByUser, getWeekBalance, getDailyBalance} = require('../model/m_transfer')
+const { postTransfer, getTransferByUser, getWeekBalance, getDailyBalance, getTransferCount} = require('../model/m_transfer')
 const { postNotification } = require('../model/m_notification')
 
 module.exports = {
@@ -82,6 +82,27 @@ module.exports = {
     },
     getUserTransfer: async (request, response) => {
         const { id } = request.params
+        let { page, limit } = request.query
+        page = page == undefined || page == '' ? 1 : parseInt(page)
+        limit = limit == undefined || limit == '' ? 5 : parseInt(limit)
+
+        const totalData = await getTransferCount(id)
+        console.log(totalData)
+        const totalPage = Math.ceil(totalData / limit)
+        let offset = page * limit - limit
+
+        let prevLink = helper.getPrevLink(page, request.query)
+        let nextLink = helper.getNextLink(page, totalPage, request.query)
+
+        const pageInfo = {
+            page,
+            totalPage,
+            limit,
+            totalData,
+            prevLink: prevLink && `http://127.0.0.1:3000/history?${prevLink}`,
+            nextLink: nextLink && `http://127.0.0.1:3000/history?${nextLink}`
+        }
+
         try {
             const checkUser = await getUserByIdV2(id)
 
@@ -89,14 +110,15 @@ module.exports = {
                 return helper.response(response, 404, 'User is not found!')
 
             } else {
-                const result = await getTransferByUser(id)
+                const result = await getTransferByUser(id, limit, offset)
 
                 for (i = 0; i < result.length; i++) {
                     const getName = await getUserByIdV2(result[i].user_id_b)
                     result[i].user_name_b = getName[0].user_first_name + ' ' + getName[0].user_last_name
+                    result[i].user_picture_b = getName[0].user_picture
                 }
 
-                helper.response(response, 200, `Success get transaction by user ID ${id}`, result)
+                helper.response(response, 200, `Success get transaction by user ID ${id}`, result, pageInfo)
             }
         } catch (e) {
             console.log(e)
@@ -107,7 +129,6 @@ module.exports = {
         const { id } = request.params
         try {
             const weekExpense =  await getWeekBalance(id, 1)
-            console.log(weekExpense)
             const weekIncome =  await getWeekBalance(id, 2)
             const dailyExpense = await getDailyBalance(id, 1)
             const dailyIncome = await getDailyBalance(id, 2)
@@ -124,6 +145,7 @@ module.exports = {
              helper.response(response, 200, `Success get balance statistic by user ID ${id}`, result)
         } catch(e) {
             console.log(e);
+            return helper.response(response, 400, 'Bad Request')
         }
     }
 }
