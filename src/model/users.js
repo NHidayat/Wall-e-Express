@@ -8,9 +8,9 @@ module.exports = {
             });
         });
     },
-    getUserByName: (search) => {
+    getUserByName: (search, limit, offset) => {
         return new Promise((resolve, reject) => {
-            connection.query(`SELECT * FROM user WHERE user_first_name LIKE '%${search}%' OR user_last_name LIKE '%${search}%'`, (error, result) => {
+            connection.query(`SELECT * FROM user WHERE user_first_name LIKE '%${search}%' OR user_last_name LIKE '%${search}%' LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
                 !error ? resolve(result) : reject(new Error(error));
             });
         });
@@ -19,6 +19,16 @@ module.exports = {
         return new Promise((resolve, reject) => {
             connection.query(
                 "SELECT COUNT(*) as total FROM user ",
+                (error, result) => {
+                    !error ? resolve(result[0].total) : reject(new Error(error));
+                }
+            );
+        });
+    },
+    getUserCountByName: (search) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                `SELECT COUNT(*) as total FROM user WHERE user_first_name LIKE '%${search}%' OR user_last_name LIKE '%${search}%'`,
                 (error, result) => {
                     !error ? resolve(result[0].total) : reject(new Error(error));
                 }

@@ -8,6 +8,7 @@ const {
     getAllUser,
     getUserByName,
     getUserCount,
+    getUserCountByName,
     getUserById,
     getPasswordById,
     checkPin,
@@ -85,13 +86,38 @@ module.exports = {
     },
     getUserByName: async (request, response) => {
         try {
-            let { search } = request.query;
+            let { search, page, limit } = request.query;
 
             if (search === undefined || search === null || search === "") {
                 search = "%";
             }
-            const result = await getUserByName(search);
-            return helper.response(response, 200, "Success Get All User", result);
+            if (page === undefined || page === null || page === "") {
+                page = parseInt(1);
+            } else {
+                page = parseInt(page);
+            }
+            if (limit === undefined || limit === null || limit === "") {
+                limit = parseInt(9);
+            } else {
+                limit = parseInt(limit);
+            }
+            let totalData = await getUserCountByName(search);
+            let totalPage = Math.ceil(totalData / limit);
+            let limits = page * limit;
+            let offset = page * limit - limit;
+            let prevLink = getPrevLink(page, request.query);
+            let nextLink = getNextLink(page, totalPage, request.query);
+
+            const pageInfo = {
+                page,
+                totalPage,
+                limit,
+                totalData,
+                prevLink: prevLink && `http://127.0.0.1:3001/users/user/name?${prevLink}`,
+                nextLink: nextLink && `http://127.0.0.1:3001/users/user/name?${nextLink}`,
+            };
+            const result = await getUserByName(search, limit, offset);
+            return helper.response(response, 200, "Success Get All User", result, pageInfo);
         } catch (error) {
             return helper.response(response, 400, "Bad Request", error);
         }
