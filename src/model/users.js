@@ -1,11 +1,28 @@
 const connection = require("../config/mysql");
 
 module.exports = {
-    getAllUser: () => {
+    getAllUser: (sort, limit, offset) => {
         return new Promise((resolve, reject) => {
-            connection.query(`SELECT * FROM user`, (error, result) => {
+            connection.query(`SELECT * FROM user WHERE user_status = 1 ORDER BY ${sort} LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
                 !error ? resolve(result) : reject(new Error(error));
             });
+        });
+    },
+    getUserByName: (search) => {
+        return new Promise((resolve, reject) => {
+            connection.query(`SELECT * FROM user WHERE user_first_name LIKE '%${search}%' OR user_last_name LIKE '%${search}%'`, (error, result) => {
+                !error ? resolve(result) : reject(new Error(error));
+            });
+        });
+    },
+    getUserCount: () => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT COUNT(*) as total FROM user ",
+                (error, result) => {
+                    !error ? resolve(result[0].total) : reject(new Error(error));
+                }
+            );
         });
     },
     getUserById: (id) => {
@@ -18,7 +35,6 @@ module.exports = {
                         result.map(value => {
                             delete value.user_key
                             delete value.user_password
-                            delete value.user_pin
                         })
                         resolve(result)
                     } else {
@@ -103,6 +119,17 @@ module.exports = {
             connection.query(
                 "SELECT user_phone FROM user WHERE (user_phone=?)",
                 phone,
+                (error, result) => {
+                    !error ? resolve(result) : reject(new Error(error));
+                }
+            );
+        });
+    },
+    isPhone_OtherUserExist: (phone, user_id) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT user_phone FROM user WHERE user_phone = ? AND user_id != ?",
+                [phone, user_id],
                 (error, result) => {
                     !error ? resolve(result) : reject(new Error(error));
                 }

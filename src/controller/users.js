@@ -3,8 +3,11 @@ const helper = require("../helper/index");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer")
 const fs = require("fs");
+const qs = require("querystring");
 const {
     getAllUser,
+    getUserByName,
+    getUserCount,
     getUserById,
     getPasswordById,
     checkPin,
@@ -14,13 +17,80 @@ const {
     postUser,
     checkUser,
     checkKey,
-    updating
+    updating,
+    isPhone_OtherUserExist
 } = require("../model/users");
 
+const getPrevLink = (page, currentQuery) => {
+    if (page > 1) {
+        const generatedPage = {
+            page: page - 1,
+        };
+        const resultPrevLink = { ...currentQuery, ...generatedPage };
+        return qs.stringify(resultPrevLink);
+    } else {
+        return null;
+    }
+};
+
+const getNextLink = (page, totalPage, currentQuery) => {
+    if (page < totalPage) {
+        const generatedPage = {
+            page: page + 1,
+        };
+        const resultNextLink = { ...currentQuery, ...generatedPage };
+        return qs.stringify(resultNextLink);
+    } else {
+        return null;
+    }
+};
 module.exports = {
     getAllUser: async (request, response) => {
         try {
-            const result = await getAllUser();
+            let { sort, page, limit } = request.query;
+
+            if (sort === undefined || sort === null || sort === "") {
+                sort = `user_id`;
+            }
+            if (page === undefined || page === null || page === "") {
+                page = parseInt(1);
+            } else {
+                page = parseInt(page);
+            }
+            if (limit === undefined || limit === null || limit === "") {
+                limit = parseInt(9);
+            } else {
+                limit = parseInt(limit);
+            }
+            let totalData = await getUserCount();
+            let totalPage = Math.ceil(totalData / limit);
+            let limits = page * limit;
+            let offset = page * limit - limit;
+            let prevLink = getPrevLink(page, request.query);
+            let nextLink = getNextLink(page, totalPage, request.query);
+
+            const pageInfo = {
+                page,
+                totalPage,
+                limit,
+                totalData,
+                prevLink: prevLink && `http://127.0.0.1:3001/users/user?${prevLink}`,
+                nextLink: nextLink && `http://127.0.0.1:3001/users/user?${nextLink}`,
+            };
+            const result = await getAllUser(sort, limit, offset);
+            return helper.response(response, 200, "Success Get All User", result, pageInfo);
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error);
+        }
+    },
+    getUserByName: async (request, response) => {
+        try {
+            let { search } = request.query;
+
+            if (search === undefined || search === null || search === "") {
+                search = "%";
+            }
+            const result = await getUserByName(search);
             return helper.response(response, 200, "Success Get All User", result);
         } catch (error) {
             return helper.response(response, 400, "Bad Request", error);
@@ -108,59 +178,54 @@ module.exports = {
         try {
             const { user_id } = request.params;
             const { user_first_name, user_last_name, user_phone } = request.body
-            const checkUser = await getUserById(user_id)
-            if (checkUser.length > 0) {
-                const phoneInDatabase = await isPhoneExist(user_phone)
-                console.log(phoneInDatabase)
-                const setDataUser = {
-                    user_first_name: user_first_name,
-                    user_last_name: user_last_name,
-                    user_phone: user_phone,
-                }
-                if (
-                    request.body.user_first_name === undefined ||
-                    request.body.user_first_name === null ||
-                    request.body.user_first_name === ""
-                ) {
-                    setDataUser.user_first_name = checkUser[0].user_first_name
-                    // return helper.response(response, 404, "First name must be filled");
-                } else if (
-                    request.body.user_last_name === undefined ||
-                    request.body.user_last_name === null ||
-                    request.body.user_last_name === ""
-                ) {
-                    setDataUser.user_last_name = checkUser[0].user_last_name
-                    // return helper.response(response, 404, "Last name must be filled");
-                } else if (
-                    request.body.user_phone === undefined ||
-                    request.body.user_phone === null ||
-                    request.body.user_phone === ""
-                ) {
-                    setDataUser.user_phone = checkUser[0].user_phone
-                    // return helper.response(response, 404, "Phone Number must be filled");
-                } else if (
-                    request.body.user_phone.length < 8 ||
-                    request.body.user_phone.length > 16
-                ) {
-                    return helper.response(response, 404, "Invalid Phone Number");
-                } else if (
-                    phoneInDatabase.length > 0
-                ) {
-                    return helper.response(response, 404, "Phone Number already exist");
-                }
-                const result = await patchUser(setDataUser, user_id);
-                return helper.response(
-                    response,
-                    200,
-                    "Success Profile Updated",
-                    result
-                );
-
+            const phoneInDatabase = await isPhone_OtherUserExist(user_id, user_phone)
+            if (
+                request.body.user_first_name === undefined ||
+                request.body.user_first_name === null ||
+                request.body.user_first_name === ""
+            ) {
+                return helper.response(response, 404, "First name must be filled");
+            } else if (
+                request.body.user_last_name === undefined ||
+                request.body.user_last_name === null ||
+                request.body.user_last_name === ""
+            ) {
+                return helper.response(response, 404, "Last name must be filled");
+            } else if (
+                request.body.user_phone === undefined ||
+                request.body.user_phone === null ||
+                request.body.user_phone === ""
+            ) {
+                return helper.response(response, 404, "Phone Number must be filled");
+            } else if (
+                request.body.user_phone.length < 8 ||
+                request.body.user_phone.length > 16
+            ) {
+                return helper.response(response, 404, "Invalid Phone Number");
+            } else if (
+                phoneInDatabase.length > 0
+            ) {
+                return helper.response(response, 404, "Phone Number already exist");
             } else {
-                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+                const checkUser = await getUserById(user_id)
+                if (checkUser.length > 0) {
+                    const setDataUser = {
+                        user_first_name: user_first_name,
+                        user_last_name: user_last_name,
+                        user_phone: user_phone,
+                    }
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Success Profile Updated",
+                        result
+                    );
+
+                } else {
+                    return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+                }
             }
-
-
         } catch (error) {
             return helper.response(response, 400, "Bad Request", error)
         }
@@ -538,14 +603,7 @@ module.exports = {
                     } = checkDataUser[0];
                     let payload = {
                         user_id,
-                        user_email,
-                        user_first_name,
-                        user_last_name,
-                        user_phone,
-                        user_picture,
-                        user_pin,
-                        user_role,
-                        user_status,
+                        user_pin
                     };
                     if (user_status == 0) {
                         return helper.response(
