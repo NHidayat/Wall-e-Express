@@ -1,7 +1,6 @@
-"# Wall-e-Express" 
 <h1 align="center">ExpressJS - Wall-E Restful API</h1>
 
-Wall-E is a Restful API for payment gateway web. [More about Express](https://en.wikipedia.org/wiki/Express.js)
+Wall-E is a Restful API for payment gateway via web. It has a clear and consistent API and fully unit tested. [More about Express](https://en.wikipedia.org/wiki/Express.js)
 
 ## Built With
 
@@ -47,63 +46,77 @@ PASS=marsupilami12
 
 **1. GET**
 
-- `/users/login`(Login user)
-- `/users/register`(Register user)
-- `/users/email`(Post activation via email)
-- `/users/activate`(Patch to activate user)
-- `/users/forgot`(Post forgot password via email)
-- `/users/change`(Patch to change password)
-- `/users/user`(Get all user)
-- `/users/user/name`(Get user by name)
+- `/users/user?sort=value&page=value&limit=value`(Get all user)
+- `/users/user/name?search=value&page=value&limit=value`(Get user by name)
 - `/users/:id`(Get user by Id)
-- `/users/patch/password/:user_id`(Patch password)
-- `/users/patch/profile/:user_id`(Patch first name, last name and phone number)
-- `/users/patch/image/:user_id`(Patch image)
 - `/users/pin/exist/:user_id`(Check if pin length > 0 in database)
 - `/users/pin/:user_id`(check if the input pin is the same as the pin in database)
-- `/users/patch/pin/:user_id`(Patch pin)
-- `/users/deactivate/:user_id`(Deactivate user)
 
-- `/users/:id`(Get user by id)
+    - `{ "user_pin": "123456" }`
+
+- `/transfer/:id`(Get user transfer by id)
+- `/transfer/balance-statistic/:id`(Get balance statistic)
+- `/notification/:id?limit=5`(Get user notification)
+- `/notification/count-unread/:id`(Get count unread notification)
 
 **2. POST**
 
-- `/product/` (Post product)
+- `/users/login`(Post login user)
 
-  - `{ "category_id": 2, "product_name": "Coca-cola", "product_price": 8000 ,"product_picture": cocacola.jpg, "product_status": 1 | 0}`
+    - `{ "user_email": "romulan@gmail.com", "user_password": "romulans"}`
 
-- `/category/` (Post category)
+- `/users/register`(Post register user)
 
-  - `{ "category_name": "Food", "category_status": 1 | 0}`
+    - `{ "user_email": romulan@gmail.com, "user_password": "romulans", "confirm_password": "romulans", "user_first_name": "Marcus", "user_last_name": "Wong", "user_phone": "08111111111"}`
 
-- `/purchase/` (Post purchase)
+- `/users/email`(Post activation via email)
 
-  - `{ "orders": [{"product_id": 1, "purchase_qty": 1},{"product_id": 2, "purchase_qty": 3}] }`
+    - `{ "user_email": "romulan@gmail.com" }`
 
-- `/users/register` (Register user)
-  - `{ "user_email": "cashier@gmail.com", "user_password": "Marakesh12", "user_name": "cashier1"}`
-- `/users/login` (Login user)
-  - `{ "user_email": "cashier@gmail.com", "user_password": "Marakesh12"}`
+- `/users/forgot`(Post forgot password via email)
+
+    - `{ "user_email": "romulan@gmail.com" }`
+
+- `/transfer/`(Post transfer)
+
+    - `{ "user_id_a": "7", "user_id_b": "1", "user_pin": "123456", "transfer_amount": "6000" }`
+
+- `/payment/`(Post notification midtrans)
+
+- `/payment/`(Post payment)
+
+    - `{ "user_id": "1", "history_nominal": "150000" }`
+
+- `/payment/top-up`(Post manual payment)
+
+    - `{ "user_id": "2", "history_nominal": "300000" }`
 
 **3. PATCH**
 
-- `/product/:id` (Update product by id)
+- `/users/activate?keys=value`(Patch to activate user)
+- `/users/change?keys=value`(Patch to change password)
 
-  - `{ "category_id": 2, "product_name": "Coca-cola", "product_price": 8000 ,"product_picture": cocacola.jpg, "product_status" : 1 | 0}`
+    - `{ "user_password": "Mamumi12", "confirm_password": "Mamumi12"}`
 
-- `/category/:id` (Update category by id)
+- `/users/patch/password/:user_id`(Patch password)
 
-  - `{ "category_name": "Food", "category_status" : 1 | 0}`
+    - `{ "old_password": "Mamumi123", "user_password": "Mamumi12", "confirm_password": "Mamumi12"}`
 
-- `/users/patch/:id` (Update user by id)
-  - `{ "user_name": "cashier1", "user_password": "Marakesh12", "user_role": 2, "user_status": 1 | 0}`
+- `/users/patch/profile/:user_id`(Patch first name, last name and phone number)
 
-**4. DELETE**
+    - `{ "user_first_name": "Marcus", "user_last_name": "Wong", "user_phone": "08111111111"}`
 
-- `/product/:id` (Delete product by id)
-- `/category/:id` (Delete category by id)
+- `/users/patch/image/:user_id`(Patch image)
+
+    - `{ "user_picture": "carl.png" }`
+
+- `/users/patch/pin/:user_id`(Patch pin)
+
+    - `{ "user_pin": "123456" }`
+
+- `/users/deactivate/:user_id`(Deactivate user)
 
 ## Postman link
 
-Link: https://web.postman.co/collections/12323107-3cd415e1-06ec-4889-9c61-e1c90c4ba219?version=latest&workspace=b7f7c54f-78e5-4889-81bc-f5c323799f66
+Link: https://www.getpostman.com/collections/cee1035f0d7e834bae81
 
