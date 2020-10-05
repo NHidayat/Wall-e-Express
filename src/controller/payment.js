@@ -28,6 +28,7 @@ module.exports = {
       );
       return helper.response(response, 200, "Success Create Payment", topUp);
     } catch (error) {
+      console.log(error)
       return helper.response(response, 400, "Bad Request");
       // [model 1] proses save data to database : userid, nominal, created_at
       // berhasil simpan ke table topup response : topupId, userid, nominal, created_at
