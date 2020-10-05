@@ -82,4 +82,11 @@ module.exports = {
       );
     });
   },
+  getHistoryById: (id) => {
+    return new Promise((resolve, reject) => {
+      db.query("SELECT * FROM history WHERE history_id = ?", id, (error, result) => {
+        !error ? resolve(result) : reject(new Error(error));
+      });
+    });
+  },
 };

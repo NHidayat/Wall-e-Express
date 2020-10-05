@@ -537,7 +537,7 @@ module.exports = {
                     from: '"Wall-E"',
                     to: user_email,
                     subject: "Wall-E - Activation Email",
-                    html: `<a href="http://localhost:8080/activate?keys=${keys}">Click Here To Activate Your Account</a>`,
+                    html: `${process.env.URL_FRONT}activate?keys=${keys}">Click Here To Activate Your Account</a>`,
                 }),
                     function (error) {
                         if (error) {
@@ -678,7 +678,7 @@ module.exports = {
                     from: '"Wall-E"',
                     to: user_email,
                     subject: "Wall-E - Forgot Password",
-                    html: `<a href="http://localhost:8080/setpassword?keys=${keys}">Click Here To Change Password</a>`,
+                    html: `${process.env.URL_FRONT}setpassword?keys=${keys}">Click Here To Change Password</a>`,
                 }),
                     function (error) {
                         if (error) {
