@@ -5,11 +5,12 @@ const { postNotification } = require('../model/m_notification')
 
 module.exports = {
     postTransfer: async (request, response) => {
-        const { user_id_a, user_id_b, transfer_amount, user_pin } = request.body
+        const { user_id_a, user_id_b, transfer_amount, user_pin, transfer_note } = request.body
 
         if (
             user_id_a == '' || user_id_a == undefined ||
             user_id_b == '' || user_id_b == undefined ||
+            transfer_note == undefined ||
             transfer_amount == '' || transfer_amount == undefined || transfer_amount < 1 ||
             user_pin == '' || user_pin == undefined
         ) {
@@ -41,6 +42,7 @@ module.exports = {
                         user_id_a,
                         user_id_b,
                         user_role: 1,
+                        transfer_note,
                         transfer_amount,
                     }
                     const post1 = await postTransfer(setData)
@@ -87,7 +89,6 @@ module.exports = {
         limit = limit == undefined || limit == '' ? 5 : parseInt(limit)
 
         const totalData = await getTransferCount(id)
-        console.log(totalData)
         const totalPage = Math.ceil(totalData / limit)
         let offset = page * limit - limit
 
