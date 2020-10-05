@@ -550,6 +550,7 @@ module.exports = {
                 return helper.response(response, 400, 'Email is not registered !')
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, 'Bad Request', error)
         }
     },
@@ -589,6 +590,7 @@ module.exports = {
                 return helper.response(response, 400, `Invalid key`);
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 404, "Bad Request", error)
         }
     },
@@ -650,6 +652,7 @@ module.exports = {
                 return helper.response(response, 400, "Email is not Registered !");
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, "Bad Request");
         }
     },
@@ -691,6 +694,7 @@ module.exports = {
                 return helper.response(response, 400, 'Email is not registered !')
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, "Bad Request", error)
         }
     },
@@ -765,6 +769,7 @@ module.exports = {
                 return helper.response(response, 404, `Invalid key`);
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 404, "Bad Request", error);
         }
     },
