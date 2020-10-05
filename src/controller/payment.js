@@ -123,6 +123,7 @@ module.exports = {
         user_id,
         history_nominal,
         history_created_at: new Date(),
+        history_status: 2
       };
       if (user_id === "" || user_id === null) {
         return helper.response(response, 400, "User ID must be filled");
