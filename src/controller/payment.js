@@ -19,6 +19,7 @@ module.exports = {
         user_id,
         history_nominal,
         history_created_at: new Date(),
+        history_status: 2
       };
       const topUpHistory = await postHistory(setData);
       console.log(topUpHistory);
