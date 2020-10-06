@@ -310,6 +310,45 @@ module.exports = {
             return helper.response(response, 400, "Bad Request", error)
         }
     },
+    deleteImage: async (request, response) => {
+        try {
+            const { user_id } = request.params;
+            const checkUser = await getUserById(user_id)
+            if (checkUser.length > 0) {
+                const setDataUser = {
+                    user_picture: 'blank.jpg'
+                }
+                if (
+                    checkUser[0].user_picture === "blank.jpg"
+                ) {
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Image Deleted Successfully",
+                        result
+                    );
+                } else {
+                    fs.unlink(`./uploads/${checkUser[0].user_picture}`, (error) => {
+                        if (error) {
+                            throw error
+                        }
+                    })
+                    const result = await patchUser(setDataUser, user_id);
+                    return helper.response(
+                        response,
+                        200,
+                        "Image Deleted Successfully",
+                        result
+                    );
+                }
+            } else {
+                return helper.response(response, 404, `User By Id: ${user_id} Not Found`)
+            }
+        } catch (error) {
+            return helper.response(response, 400, "Bad Request", error)
+        }
+    },
     isPinExist: async (request, response) => {
         try {
             const { user_id } = request.params
