@@ -547,6 +547,7 @@ module.exports = {
             }
 
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, "Bad Request");
         }
     },
@@ -576,7 +577,7 @@ module.exports = {
                     from: '"Wall-E"',
                     to: user_email,
                     subject: "Wall-E - Activation Email",
-                    html: `<a href="http://localhost:8080/activate?keys=${keys}">Click Here To Activate Your Account</a>`,
+                    html: `${process.env.URL_FRONT}activate?keys=${keys}">Click Here To Activate Your Account</a>`,
                 }),
                     function (error) {
                         if (error) {
@@ -588,6 +589,7 @@ module.exports = {
                 return helper.response(response, 400, 'Email is not registered !')
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, 'Bad Request', error)
         }
     },
@@ -627,6 +629,7 @@ module.exports = {
                 return helper.response(response, 400, `Invalid key`);
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 404, "Bad Request", error)
         }
     },
@@ -688,6 +691,7 @@ module.exports = {
                 return helper.response(response, 400, "Email is not Registered !");
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, "Bad Request");
         }
     },
@@ -717,7 +721,7 @@ module.exports = {
                     from: '"Wall-E"',
                     to: user_email,
                     subject: "Wall-E - Forgot Password",
-                    html: `<a href="http://localhost:8080/setpassword?keys=${keys}">Click Here To Change Password</a>`,
+                    html: `${process.env.URL_FRONT}setpassword?keys=${keys}">Click Here To Change Password</a>`,
                 }),
                     function (error) {
                         if (error) {
@@ -729,6 +733,7 @@ module.exports = {
                 return helper.response(response, 400, 'Email is not registered !')
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 400, "Bad Request", error)
         }
     },
@@ -803,6 +808,7 @@ module.exports = {
                 return helper.response(response, 404, `Invalid key`);
             }
         } catch (error) {
+            console.log(error)
             return helper.response(response, 404, "Bad Request", error);
         }
     },

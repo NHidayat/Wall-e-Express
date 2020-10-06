@@ -1,3 +1,4 @@
+const midtransClient = require("midtrans-client");
 const helper = require("../helper/index");
 const {
   createPayment,
@@ -5,7 +6,10 @@ const {
   postTopUp,
   updateBalance,
   checkUser,
+  getHistoryById,
 } = require("../model/payment");
+const { getUserByIdV2 } = require('../model/users')
+const { postNotification } = require('../model/m_notification')
 
 module.exports = {
   postPayment: async (request, response) => {
@@ -15,6 +19,7 @@ module.exports = {
         user_id,
         history_nominal,
         history_created_at: new Date(),
+        history_status: 2
       };
       const topUpHistory = await postHistory(setData);
       console.log(topUpHistory);
@@ -24,6 +29,7 @@ module.exports = {
       );
       return helper.response(response, 200, "Success Create Payment", topUp);
     } catch (error) {
+      console.log(error)
       return helper.response(response, 400, "Bad Request");
       // [model 1] proses save data to database : userid, nominal, created_at
       // berhasil simpan ke table topup response : topupId, userid, nominal, created_at
@@ -42,16 +48,22 @@ module.exports = {
       serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
       clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
     });
-    snap.transaction.notification(notificationJson).then((statusResponse) => {
+    snap.transaction.notification(request.body).then( async (statusResponse) => {
+      // console.log(request.body)
       let orderId = statusResponse.order_id;
       let transactionStatus = statusResponse.transaction_status;
+      let order_id = statusResponse.order_id;
+      let gross_amount = statusResponse.gross_amount
       let fraudStatus = statusResponse.fraud_status;
 
       console.log(
         `Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}. Fraud status: ${fraudStatus}`
       );
 
-      // Sample transactionStatus handling logic
+      const checkHistory = await getHistoryById(order_id)
+      const userId = checkHistory[0].user_id
+      const getUser = await getUserByIdV2(userId)
+      const userBalance = getUser[0].user_balance 
 
       if (transactionStatus == "capture") {
         // capture only applies to card transaction, which you need to check for the fraudStatus
@@ -61,28 +73,48 @@ module.exports = {
           // TODO set transaction status on your databaase to 'success'
         }
       } else if (transactionStatus == "settlement") {
-        // TODO set transaction status on your databaase to 'success'
-        // [model 1] update data status saldo user
-        // const updateStatusResult = await modelupdateStatusResult(orderId, transactionStatus)
-        //response user_id, nominal
-        // ==================================
-        // [model 2] check nominal sebelumnya dan akan set parameternya (user_id)
-        // response nominal sebelum topup
-        // ==================================
-        // saldoBaru = nominal sebelum topup + nominal topup
-        // [model 3] update data saldo supaya saldo si user bertambah (userId, saldoBaru)
+        const calBalance = parseInt(gross_amount) + parseInt(userBalance)
+        const notifData = {
+          user_id: userId,
+          notif_subject: 'Your Topup is Sucess',
+          transfer_amount: gross_amount 
+        }
+        const sendNotif = await postNotification(notifData)
+        const updateSaldo = await updateBalance(calBalance, userId)
+        // const updateSaldo = 
       } else if (transactionStatus == "deny") {
-        // TODO you can ignore 'deny', because most of the time it allows payment retries
-        // and later can become success
+        const notifData = {
+          user_id: userId,
+          notif_subject: 'Your Topup is Denny',
+          transfer_amount: 0 
+        }
+        const sendNotif = await postNotification(notifData)
       } else if (
         transactionStatus == "cancel" ||
         transactionStatus == "expire"
       ) {
-        // TODO set transaction status on your databaase to 'failure'
+        const notifData = {
+          user_id: userId,
+          notif_subject: 'Your Topup Canceled',
+          transfer_amount: 0 
+        }
+        const sendNotif = await postNotification(notifData)
       } else if (transactionStatus == "pending") {
-        // TODO set transaction status on your databaase to 'pending' / waiting payment
+        const notifData = {
+          user_id: userId,
+          notif_subject: 'Your Topup is Pending',
+          transfer_amount: gross_amount 
+        }
+        const sendNotif = await postNotification(notifData)
       }
-    });
+    })
+    .then(() => {
+        return helper.response(response, 200, "OK")
+      })
+      .catch((error) => {
+        console.log(error)
+        return helper.response(response, 400, error)
+      })
   },
   postManualPayment: async (request, response) => {
     try {
@@ -91,6 +123,7 @@ module.exports = {
         user_id,
         history_nominal,
         history_created_at: new Date(),
+        history_status: 2
       };
       if (user_id === "" || user_id === null) {
         return helper.response(response, 400, "User ID must be filled");
