@@ -6,8 +6,8 @@ module.exports = {
     return new Promise((resolve, reject) => {
       let snap = new midtransClient.Snap({
         isProduction: false,
-        serverKey: "SB-Mid-server-KItkJVnyFsZRa-JD5HL_x_DC",
-        clientKey: "SB-Mid-client-lyiBVkXY-ImOkiuQ",
+        serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
+        clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
       });
 
       let parameter = {

@@ -47,8 +47,8 @@ module.exports = {
     console.log(request.body)
     let snap = new midtransClient.Snap({
       isProduction: false,
-      serverKey: "SB-Mid-server-KItkJVnyFsZRa-JD5HL_x_DC",
-      clientKey: "SB-Mid-client-lyiBVkXY-ImOkiuQ",
+      serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
+      clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
     });
     snap.transaction.notification(request.body).then( async (statusResponse) => {
       let orderId = statusResponse.order_id;
