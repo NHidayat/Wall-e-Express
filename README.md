@@ -38,8 +38,8 @@ DB_DATABASE=walle
 PORT=3001
 IP=127.0.0.1
 
-USER=wallecorps@gmail.com
-PASS=marsupilami12
+USER=Your Email
+PASS=Your Password
 ```
 
 ## End Point
@@ -81,11 +81,11 @@ PASS=marsupilami12
 
     - `{ "user_id_a": "7", "user_id_b": "1", "user_pin": "123456", "transfer_amount": "6000" }`
 
-- `/payment/`(Post notification midtrans)
-
 - `/payment/`(Post payment)
 
     - `{ "user_id": "1", "history_nominal": "150000" }`
+
+- `/payment/midtrans-notification`(Post notification midtrans)
 
 - `/payment/top-up`(Post manual payment)
 
@@ -110,11 +110,11 @@ PASS=marsupilami12
 
     - `{ "user_picture": "carl.png" }`
 
+- `/users/delete/image/:user_id`(Delete image)
+
 - `/users/patch/pin/:user_id`(Patch pin)
 
     - `{ "user_pin": "123456" }`
-
-- `/users/deactivate/:user_id`(Deactivate user)
 
 ## Postman link
 
