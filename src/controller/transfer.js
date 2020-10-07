@@ -1,6 +1,6 @@
 const helper = require('../helper/index');
 const { getUserByIdV2, patchUser } = require('../model/users')
-const { postTransfer, getTransferByUser, getWeekBalance, getDailyBalance, getTransferCount} = require('../model/m_transfer')
+const { postTransfer, getTransferByUser, getWeekBalance, getDailyBalance, getTransferCount } = require('../model/m_transfer')
 const { postNotification } = require('../model/m_notification')
 
 module.exports = {
@@ -78,7 +78,6 @@ module.exports = {
                 }
             }
         } catch (e) {
-            console.log(e)
             return helper.response(response, 400, 'Bad Request')
         }
     },
@@ -122,30 +121,28 @@ module.exports = {
                 helper.response(response, 200, `Success get transaction by user ID ${id}`, result, pageInfo)
             }
         } catch (e) {
-            console.log(e)
             return helper.response(response, 400, 'Bad Request')
         }
     },
     getBalanceStatistic: async (request, response) => {
         const { id } = request.params
         try {
-            const weekExpense =  await getWeekBalance(id, 1)
-            const weekIncome =  await getWeekBalance(id, 2)
+            const weekExpense = await getWeekBalance(id, 1)
+            const weekIncome = await getWeekBalance(id, 2)
             const dailyExpense = await getDailyBalance(id, 1)
             const dailyIncome = await getDailyBalance(id, 2)
 
-            const options = { weekday: 'long'}
-            for(let i = 0; i < dailyExpense.length; i++) {
+            const options = { weekday: 'long' }
+            for (let i = 0; i < dailyExpense.length; i++) {
                 dailyExpense[i].day = new Intl.DateTimeFormat('en-US', options).format(dailyExpense[i].date)
             }
 
-            for(let i = 0; i < dailyIncome.length; i++) {
+            for (let i = 0; i < dailyIncome.length; i++) {
                 dailyIncome[i].day = new Intl.DateTimeFormat('en-US', options).format(dailyIncome[i].date)
             }
             const result = { weekExpense, weekIncome, dailyExpense, dailyIncome }
-             helper.response(response, 200, `Success get balance statistic by user ID ${id}`, result)
-        } catch(e) {
-            console.log(e);
+            helper.response(response, 200, `Success get balance statistic by user ID ${id}`, result)
+        } catch (e) {
             return helper.response(response, 400, 'Bad Request')
         }
     }

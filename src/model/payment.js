@@ -23,11 +23,7 @@ module.exports = {
       snap
         .createTransaction(parameter)
         .then((transaction) => {
-          console.log(transaction);
           resolve(transaction.redirect_url);
-          // transaction token
-          // let transactionToken = transaction.token;
-          // console.log('transactionToken:',transactionToken);
         })
         .catch((error) => {
           reject(new Error(error));
@@ -59,7 +55,7 @@ module.exports = {
           };
           resolve(newResult);
         } else {
-          console.log(error);
+          reject(new Error(error))
         }
       });
     });
