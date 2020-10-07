@@ -5,6 +5,6 @@ const { authorization } = require("../middleware/auth");
 
 router.post("/", authorization, postPayment);
 router.post("/top-up", authorization, postManualPayment);
-router.post("/notification", authorization, postMidtransNotif);
+router.post("/midtrans-notification", authorization, postMidtransNotif);
 
 module.exports = router;

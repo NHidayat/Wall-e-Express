@@ -45,77 +45,77 @@ module.exports = {
   postMidtransNotif: async (request, response) => {
     console.log('MIdtrans Run')
     console.log(request.body)
-    let snap = new midtransClient.Snap({
-      isProduction: false,
-      serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
-      clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
-    });
-    snap.transaction.notification(request.body).then( async (statusResponse) => {
-      let orderId = statusResponse.order_id;
-      let transactionStatus = statusResponse.transaction_status;
-      let order_id = statusResponse.order_id;
-      let gross_amount = statusResponse.gross_amount
-      let fraudStatus = statusResponse.fraud_status;
+    // let snap = new midtransClient.Snap({
+    //   isProduction: false,
+    //   serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
+    //   clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
+    // });
+    // snap.transaction.notification(request.body).then( async (statusResponse) => {
+    //   let orderId = statusResponse.order_id;
+    //   let transactionStatus = statusResponse.transaction_status;
+    //   let order_id = statusResponse.order_id;
+    //   let gross_amount = statusResponse.gross_amount
+    //   let fraudStatus = statusResponse.fraud_status;
 
-      console.log(
-        `Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}. Fraud status: ${fraudStatus}`
-      );
+    //   console.log(
+    //     `Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}. Fraud status: ${fraudStatus}`
+    //   );
 
-      const checkHistory = await getHistoryById(order_id)
-      const userId = checkHistory[0].user_id
-      const getUser = await getUserByIdV2(userId)
-      const userBalance = getUser[0].user_balance 
+    //   const checkHistory = await getHistoryById(order_id)
+    //   const userId = checkHistory[0].user_id
+    //   const getUser = await getUserByIdV2(userId)
+    //   const userBalance = getUser[0].user_balance 
 
-      if (transactionStatus == "capture") {
-        // capture only applies to card transaction, which you need to check for the fraudStatus
-        if (fraudStatus == "challenge") {
-          // TODO set transaction status on your databaase to 'challenge'
-        } else if (fraudStatus == "accept") {
-          // TODO set transaction status on your databaase to 'success'
-        }
-      } else if (transactionStatus == "settlement") {
-        const calBalance = parseInt(gross_amount) + parseInt(userBalance)
-        const notifData = {
-          user_id: userId,
-          notif_subject: 'Your Topup is Sucess',
-          transfer_amount: gross_amount 
-        }
-        const sendNotif = await postNotification(notifData)
-        const updateSaldo = await updateBalance(calBalance, userId)
-        // const updateSaldo = 
-      } else if (transactionStatus == "deny") {
-        const notifData = {
-          user_id: userId,
-          notif_subject: 'Your Topup is Denny',
-          transfer_amount: 0 
-        }
-        const sendNotif = await postNotification(notifData)
-      } else if (
-        transactionStatus == "cancel" ||
-        transactionStatus == "expire"
-      ) {
-        const notifData = {
-          user_id: userId,
-          notif_subject: 'Your Topup Canceled',
-          transfer_amount: 0 
-        }
-        const sendNotif = await postNotification(notifData)
-      } else if (transactionStatus == "pending") {
-        const notifData = {
-          user_id: userId,
-          notif_subject: 'Your Topup is Pending',
-          transfer_amount: gross_amount 
-        }
-        const sendNotif = await postNotification(notifData)
-      }
-    })
-    .then(() => {
-        return helper.response(response, 200, "OK")
-      })
-      .catch((error) => {
-        console.log(error)
-        return helper.response(response, 400, error)
-      })
+    //   if (transactionStatus == "capture") {
+    //     // capture only applies to card transaction, which you need to check for the fraudStatus
+    //     if (fraudStatus == "challenge") {
+    //       // TODO set transaction status on your databaase to 'challenge'
+    //     } else if (fraudStatus == "accept") {
+    //       // TODO set transaction status on your databaase to 'success'
+    //     }
+    //   } else if (transactionStatus == "settlement") {
+    //     const calBalance = parseInt(gross_amount) + parseInt(userBalance)
+    //     const notifData = {
+    //       user_id: userId,
+    //       notif_subject: 'Your Topup is Sucess',
+    //       transfer_amount: gross_amount 
+    //     }
+    //     const sendNotif = await postNotification(notifData)
+    //     const updateSaldo = await updateBalance(calBalance, userId)
+    //     // const updateSaldo = 
+    //   } else if (transactionStatus == "deny") {
+    //     const notifData = {
+    //       user_id: userId,
+    //       notif_subject: 'Your Topup is Denny',
+    //       transfer_amount: 0 
+    //     }
+    //     const sendNotif = await postNotification(notifData)
+    //   } else if (
+    //     transactionStatus == "cancel" ||
+    //     transactionStatus == "expire"
+    //   ) {
+    //     const notifData = {
+    //       user_id: userId,
+    //       notif_subject: 'Your Topup Canceled',
+    //       transfer_amount: 0 
+    //     }
+    //     const sendNotif = await postNotification(notifData)
+    //   } else if (transactionStatus == "pending") {
+    //     const notifData = {
+    //       user_id: userId,
+    //       notif_subject: 'Your Topup is Pending',
+    //       transfer_amount: gross_amount 
+    //     }
+    //     const sendNotif = await postNotification(notifData)
+    //   }
+    // })
+    // .then(() => {
+    //     return helper.response(response, 200, "OK")
+    //   })
+    //   .catch((error) => {
+    //     console.log(error)
+    //     return helper.response(response, 400, error)
+    //   })
   },
   postManualPayment: async (request, response) => {
     try {
