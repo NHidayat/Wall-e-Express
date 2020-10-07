@@ -49,7 +49,7 @@ module.exports = {
       clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
     });
     snap.transaction.notification(request.body).then( async (statusResponse) => {
-      // console.log(request.body)
+      console.log(request.body)
       let orderId = statusResponse.order_id;
       let transactionStatus = statusResponse.transaction_status;
       let order_id = statusResponse.order_id;
