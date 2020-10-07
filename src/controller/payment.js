@@ -43,13 +43,14 @@ module.exports = {
     }
   },
   postMidtransNotif: async (request, response) => {
+    console.log('MIdtrans Run')
+    console.log(request.body)
     let snap = new midtransClient.Snap({
       isProduction: false,
       serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
       clientKey: "SB-Mid-client-46hKURBaHDya1KTT",
     });
     snap.transaction.notification(request.body).then( async (statusResponse) => {
-      console.log(request.body)
       let orderId = statusResponse.order_id;
       let transactionStatus = statusResponse.transaction_status;
       let order_id = statusResponse.order_id;
