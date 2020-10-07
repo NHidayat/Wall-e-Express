@@ -32,6 +32,8 @@ module.exports = {
     }
   },
   postMidtransNotif: async (request, response) => {
+    console.log('MIdtrans Run')
+    console.log(request.body)
     let snap = new midtransClient.Snap({
       isProduction: false,
       serverKey: "SB-Mid-server-YaT4PLgm0f1BcIn1Psy4UmHy",
