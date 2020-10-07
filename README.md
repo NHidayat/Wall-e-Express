@@ -38,8 +38,8 @@ DB_DATABASE=walle
 PORT=3001
 IP=127.0.0.1
 
-USER=wallecorps@gmail.com
-PASS=marsupilami12
+USER=Your Email
+PASS=Your Password
 ```
 
 ## End Point
@@ -115,8 +115,6 @@ PASS=marsupilami12
 - `/users/patch/pin/:user_id`(Patch pin)
 
     - `{ "user_pin": "123456" }`
-
-- `/users/deactivate/:user_id`(Deactivate user)
 
 ## Postman link
 
