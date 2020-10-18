@@ -571,13 +571,13 @@ module.exports = {
                     port: 465,
                     secure: true,
                     auth: {
-                        user: process.env.USER,
-                        pass: process.env.PASS,
+                        user: process.env.USER_EMAIL,
+                        pass: process.env.PASS_EMAIL,
                     },
                 });
 
                 let info = await transporter.sendMail({
-                    from: `"PT Wall-E 👻" <${process.env.USER}>`,
+                    from: `"PT Wall-E 👻" <${process.env.USER_EMAIL}>`,
                     to: user_email,
                     subject: "Activation Email ✔",
                     html: email_body,
@@ -713,13 +713,13 @@ module.exports = {
                     port: 465,
                     secure: true,
                     auth: {
-                        user: process.env.USER,
-                        pass: process.env.PASS,
+                        user: process.env.USER_EMAIL,
+                        pass: process.env.PASS_EMAIL,
                     },
                 });
 
                 let info = await transporter.sendMail({
-                    from: `"PT Wall-E" <${process.env.USER}>`,
+                    from: `"PT Wall-E" <${process.env.USER_EMAIL}>`,
                     to: user_email,
                     subject: "Change Password Confimation",
                     html: email_body,
