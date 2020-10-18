@@ -135,7 +135,6 @@ module.exports = {
             return helper.response(response, 400, 'Bad Request', error)
         }
     },
-    //======================================Edit User============================================
     patchPassword: async (request, response) => {
         try {
             const { user_id } = request.params;
@@ -450,8 +449,6 @@ module.exports = {
             return helper.response(response, 400, "Bad Request", error)
         }
     },
-    //===============================================================================================
-    //======================================Register================================================
     registerUser: async (request, response) => {
         try {
             const { user_email, user_password, user_first_name, user_last_name, user_phone } = request.body;
@@ -547,12 +544,9 @@ module.exports = {
             }
 
         } catch (error) {
-            console.log(error)
             return helper.response(response, 400, "Bad Request");
         }
     },
-    //===================================================================================================
-    //===========================================Activation User=========================================
     activationEmail: async (request, response) => {
         try {
             const { user_email } = request.body;
@@ -595,7 +589,6 @@ module.exports = {
                 return helper.response(response, 400, 'Email is not registered !')
             }
         } catch (error) {
-            console.log(error)
             return helper.response(response, 400, 'Bad Request', error)
         }
     },
@@ -635,12 +628,9 @@ module.exports = {
                 return helper.response(response, 400, `Invalid key`);
             }
         } catch (error) {
-            console.log(error)
             return helper.response(response, 404, "Bad Request", error)
         }
     },
-    //======================================================================================
-    //==================================Login============================================
     loginUser: async (request, response) => {
         if (
             request.body.user_email === undefined ||
@@ -697,12 +687,9 @@ module.exports = {
                 return helper.response(response, 400, "Email is not Registered !");
             }
         } catch (error) {
-            console.log(error)
             return helper.response(response, 400, "Bad Request");
         }
     },
-    //================================================================================================
-    //==========================================Forgot Password===================================================
     forgotPassword: async (request, response) => {
         try {
             const { user_email } = request.body
@@ -745,7 +732,6 @@ module.exports = {
                 return helper.response(response, 400, 'Email is not registered !')
             }
         } catch (error) {
-            console.log(error)
             return helper.response(response, 400, "Bad Request", error)
         }
     },
@@ -820,7 +806,6 @@ module.exports = {
                 return helper.response(response, 404, `Invalid key`);
             }
         } catch (error) {
-            console.log(error)
             return helper.response(response, 404, "Bad Request", error);
         }
     },

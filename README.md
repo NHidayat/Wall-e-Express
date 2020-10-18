@@ -118,5 +118,5 @@ PASS=Your Password
 
 ## Postman link
 
-Link: https://www.getpostman.com/collections/cee1035f0d7e834bae81
+Link: https://documenter.getpostman.com/view/12323107/TVRhcUsT
 
