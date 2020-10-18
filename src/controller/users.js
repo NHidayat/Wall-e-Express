@@ -577,14 +577,13 @@ module.exports = {
                 });
 
                 let info = await transporter.sendMail({
-                    from: `"PT Wall-E" <${process.env.USER}>`,
+                    from: `"PT Wall-E 👻" <${process.env.USER}>`,
                     to: user_email,
-                    subject: "Activation Email",
+                    subject: "Activation Email ✔",
                     html: email_body,
                 });
-
-                console.log("Message sent: %s", info.messageId);
-                return helper.response(response, 200, 'Email has been sent !')
+                const newResult = { message_sent: info.messageId }
+                return helper.response(response, 200, 'Email has been sent !', newResult)
             } else {
                 return helper.response(response, 400, 'Email is not registered !')
             }
