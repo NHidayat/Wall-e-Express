@@ -563,27 +563,33 @@ module.exports = {
                     user_key: keys,
                     user_updated_at: new Date()
                 }
+                let email_body = `
+                <div>
+                    <h2>Hello Wall-E Friends</h2>
+                    <a href="${process.env.URL_FRONT}activate?keys=${keys}">
+                        Click Here To Activate Your Account
+                    </a>
+                </div>
+                `
                 await updating(data, user_email)
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
+                let transporter = nodemailer.createTransport({
+                    host: "smtp.gmail.com",
                     port: 465,
                     secure: true,
                     auth: {
                         user: process.env.USER,
-                        pass: process.env.PASS
-                    }
-                })
-                await transporter.sendMail({
-                    from: '"Wall-E"',
+                        pass: process.env.PASS,
+                    },
+                });
+
+                let info = await transporter.sendMail({
+                    from: `"PT Wall-E" <${process.env.USER}>`,
                     to: user_email,
-                    subject: "Wall-E - Activation Email",
-                    html: `${process.env.URL_FRONT}activate?keys=${keys}">Click Here To Activate Your Account</a>`,
-                }),
-                    function (error) {
-                        if (error) {
-                            return helper.response(response, 400, 'Email not sent !')
-                        }
-                    }
+                    subject: "Activation Email",
+                    html: email_body,
+                });
+
+                console.log("Message sent: %s", info.messageId);
                 return helper.response(response, 200, 'Email has been sent !')
             } else {
                 return helper.response(response, 400, 'Email is not registered !')
@@ -708,7 +714,15 @@ module.exports = {
                     user_updated_at: new Date(),
                 };
                 await updating(data, user_email);
-                const transporter = nodemailer.createTransport({
+
+                let email_body = `
+                <div>
+                    <h2>Hello Wall-E Friends</h2>
+                    <a href="${process.env.URL_FRONT}setpassword?keys=${keys}">Click Here to change your password
+                    </a>
+                </div>
+                `
+                let transporter = nodemailer.createTransport({
                     host: "smtp.gmail.com",
                     port: 465,
                     secure: true,
@@ -716,18 +730,16 @@ module.exports = {
                         user: process.env.USER,
                         pass: process.env.PASS,
                     },
-                })
-                await transporter.sendMail({
-                    from: '"Wall-E"',
+                });
+
+                let info = await transporter.sendMail({
+                    from: `"PT Wall-E" <${process.env.USER}>`,
                     to: user_email,
-                    subject: "Wall-E - Forgot Password",
-                    html: `${process.env.URL_FRONT}setpassword?keys=${keys}">Click Here To Change Password</a>`,
-                }),
-                    function (error) {
-                        if (error) {
-                            return helper.response(response, 400, "Email not sent !")
-                        }
-                    };
+                    subject: "Change Password Confimation",
+                    html: email_body,
+                });
+
+                console.log("Message sent: %s", info.messageId);
                 return helper.response(response, 200, "Email has been sent !")
             } else {
                 return helper.response(response, 400, 'Email is not registered !')
