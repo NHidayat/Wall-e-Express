@@ -64,13 +64,21 @@ module.exports = {
                     setSaldo.user_balance = calBalanceB
                     const UpdateUserB_Balance = await patchUser(setSaldo, user_id_b)
 
-                    const fullName = checkUserA[0].user_first_name + ' ' + checkUserA[0].user_last_name
-                    const setNotifData = {
-                        user_id: user_id_b,
-                        notif_subject: 'Transfered from ' + fullName,
+                    const fullName_B = checkUserB[0].user_first_name + ' ' + checkUserB[0].user_last_name
+                    const setNotifData_A = {
+                        user_id: user_id_a ,
+                        notif_subject: 'Transfer to ' + fullName_B + ' was successful',
                         transfer_amount,
                     }
-                    const postNotif = postNotification(setNotifData)
+                    const fullName_A = checkUserA[0].user_first_name + ' ' + checkUserA[0].user_last_name
+                    const setNotifData_B = {
+                        user_id: user_id_b,
+                        notif_subject: 'Transfered from ' + fullName_A,
+                        transfer_amount,
+                    }
+
+                    const postNotif_userA = await postNotification(setNotifData_A)
+                    const postNotif_userB = await postNotification(setNotifData_B)
 
                     const newResult = { post1, post2 }
                     const formatBalanceA = helper.formatN(calBalanceA)
