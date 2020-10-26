@@ -627,7 +627,8 @@ module.exports = {
                 return helper.response(response, 400, `Invalid key`);
             }
         } catch (error) {
-            return helper.response(response, 404, "Bad Request", error)
+            console.log(error)
+            return helper.response(response, 400, "Bad Request", error)
         }
     },
     loginUser: async (request, response) => {
