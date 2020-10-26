@@ -627,7 +627,6 @@ module.exports = {
                 return helper.response(response, 400, `Invalid key`);
             }
         } catch (error) {
-            console.log(error)
             return helper.response(response, 400, "Bad Request", error)
         }
     },
